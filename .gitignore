@@ -7,3 +7,5 @@ tfplan
 crash.log
 *.pem
 .env
+
+*.bak

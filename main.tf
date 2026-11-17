@@ -233,11 +233,17 @@ resource "aws_lb_listener" "http" {
   }
 }
 
-# Point the hostname to the ALB using an A alias record.
+# Geographic routing to the West Coast load balancer.
 resource "aws_route53_record" "web" {
-  zone_id = var.hosted_zone_id
-  name    = "dlc-linux-lb.dialloholmes.net"
-  type    = "A"
+  zone_id        = var.hosted_zone_id
+  name           = "dlc-linux-lb.dialloholmes.net"
+  type           = "A"
+  set_identifier = "us-west"
+
+  geoproximity_routing_policy {
+    aws_region = var.aws_region
+    bias       = 0
+  }
 
   alias {
     name                   = aws_lb.web.dns_name

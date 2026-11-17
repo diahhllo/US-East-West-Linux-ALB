@@ -35,3 +35,41 @@
 - Linux2: running.
 - Load balancer: serving requests.
 - GitHub upload: pending.
+
+# Stage 2: East/West Geographic Redundancy
+
+## Infrastructure added
+- Deployed Linux3 and Linux4 with Apache in us-east-1.
+- Created East Coast networking, security groups, and an ALB.
+- Verified both East servers displayed their custom welcome messages.
+
+## Shared DNS
+- Converted dlc-linux-lb.dialloholmes.net from West-only routing
+  to two geoproximity A alias records for East and West.
+- Enabled Evaluate Target Health on both aliases.
+- Used geographic proximity rather than explicit country/state rules.
+
+## Verified regional failover
+- Stopped both West servers.
+- Confirmed East targets remained healthy and West targets were unused.
+- Initially observed HTTP 502/503 responses during the transition.
+- Subsequently confirmed the shared hostname resolved to East ALB IPs.
+- Verified the shared hostname served US East welcome messages.
+- West-to-East failover: PASSED.
+- The precise cause of the initial errors was not conclusively isolated.
+
+## Configuration issue fixed
+- Manual editing introduced duplicated and incomplete DNS resource blocks.
+- Rebuilt the damaged section and passed terraform validate.
+
+## Remaining verification
+- Confirm both West servers are healthy after restart.
+- Test geographic selection from West and East connections
+  while both regions are healthy.
+- Test East-to-West failover and restore East afterward.
+
+## State management
+- This project extends the original West deployment using its existing state.
+- The original GitHub repository preserves the West-only code.
+- Do not independently apply the old West-only configuration against
+  this expanded deployment's state.
